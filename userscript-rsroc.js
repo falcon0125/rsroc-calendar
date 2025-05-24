@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name RSROC Event Details
 // @namespace http://tampermonkey.net/
-// @version 0.6
+// @version 0.7
 // @description Extract event details and display them on the calendar page
 // @author Cheng Hsien Tsou
 // @match https://www.rsroc.org.tw/action/*
@@ -169,7 +169,7 @@
             const googleCalendarDate = formatGoogleCalendarDate(details.eventDateTime);
             if (googleCalendarDate) {
                 const googleCalendarLink = document.createElement('a');
-                const calendarDetails = `時間: ${details.eventDateTime}\n地點: ${details.eventLocation}\n活動內容: ${details.eventContent}\n\n聯絡資訊: ${details.contactInfo}\n\n原始連結: ${window.location.href}`;
+                const calendarDetails = `時間: ${details.eventDateTime}\n地點: ${details.eventLocation}\n教育積點: ${details.educationPoints}\n認定時數: ${details.recognizedHours}\n活動內容: ${details.eventContent}\n\n聯絡資訊: ${details.contactInfo}\n\n原始連結: ${window.location.href}`;
                 googleCalendarLink.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(details.eventTitle)}&dates=${googleCalendarDate}&details=${encodeURIComponent(calendarDetails)}&location=${encodeURIComponent(details.eventLocation)}`;
                 googleCalendarLink.target = '_blank';
                 googleCalendarLink.innerText = '📅 加入 Google 日曆';
@@ -223,6 +223,8 @@
             eventDiv.dataset.eventTitle = details.eventTitle;
             eventDiv.dataset.eventDateTime = details.eventDateTime;
             eventDiv.dataset.eventLocation = details.eventLocation;
+            eventDiv.dataset.educationPoints = details.educationPoints;
+            eventDiv.dataset.recognizedHours = details.recognizedHours;
 
             if (details.educationPoints !== 'N/A' || details.recognizedHours !== 'N/A' || details.eventDateTime) {
                 const moreInfoDiv = document.createElement('div');
@@ -235,7 +237,7 @@
                     const googleCalendarDate = formatGoogleCalendarDate(details.eventDateTime);
                     if (googleCalendarDate) {
                         const googleCalendarLink = document.createElement('a');
-                        const calendarDetails = `時間: ${details.eventDateTime}\n活動內容: ${details.eventContent}\n\n聯絡資訊: ${details.contactInfo}\n\n原始連結: ${url}`;
+                        const calendarDetails = `時間: ${details.eventDateTime}\n教育積點: ${details.educationPoints}\n認定時數: ${details.recognizedHours}\n活動內容: ${details.eventContent}\n\n聯絡資訊: ${details.contactInfo}\n\n原始連結: ${url}`;
                         googleCalendarLink.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(details.eventTitle)}&dates=${googleCalendarDate}&details=${encodeURIComponent(calendarDetails)}&location=${encodeURIComponent(details.eventLocation)}`;
                         googleCalendarLink.target = '_blank';
                         googleCalendarLink.innerText = '📅';
@@ -248,26 +250,26 @@
             }
 
             // Add hover event listeners
-            eventDiv.addEventListener('mouseover', (event) => {
-                let content = event.target.dataset.eventContent || '無活動內容';
-                const contact = event.target.dataset.contactInfo || '無聯絡資訊';
-                const dateTime = event.target.dataset.eventDateTime || '無活動時間';
-                const location = event.target.dataset.eventLocation || '無活動地點';
+            eventDiv.addEventListener('mouseover', () => {
+                let content = eventDiv.dataset.eventContent || '無活動內容';
+                const contact = eventDiv.dataset.contactInfo || '無聯絡資訊';
+                const dateTime = eventDiv.dataset.eventDateTime || '無活動時間';
+                const location = eventDiv.dataset.eventLocation || '無活動地點';
 
                 if (link.href.startsWith('https://www.rsroc.org.tw/action/actions_onlinedetail.asp')) {
-                    const googleCalendarDate = formatGoogleCalendarDate(event.target.dataset.eventDateTime);
+                    const googleCalendarDate = formatGoogleCalendarDate(eventDiv.dataset.eventDateTime);
                     if (googleCalendarDate) {
-                        const eventTitle = event.target.dataset.eventTitle;
-                        const eventLocation = event.target.dataset.eventLocation;
+                        const eventTitle = eventDiv.dataset.eventTitle;
+                        const eventLocation = eventDiv.dataset.eventLocation;
                         const originalUrl = link.href;
 
                         const calendarDetailsForTooltip = `時間: ${dateTime}\n地點: ${location}\n活動內容: ${content}\n\n聯絡資訊: ${contact}\n\n原始連結: ${originalUrl}`;
                         const googleCalendarLinkHtml = `<a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${googleCalendarDate}&details=${encodeURIComponent(calendarDetailsForTooltip)}&location=${encodeURIComponent(eventLocation)}" target="_blank">📅 加入 Google 日曆</a>`;
-                        content += `<br><br>${googleCalendarLinkHtml}`;
+                        
                     }
                 }
 
-                tooltip.innerHTML = `<strong>時間:</strong><br>${dateTime}<br><br><strong>地點:</strong><br>${location}<br><br><strong>活動內容:</strong><br>${content}<br><br><strong>聯絡資訊:</strong><br>${contact}`;
+                tooltip.innerHTML = `<strong>時間:</strong><br>${dateTime}<br><br><strong>地點:</strong><br>${location}<br><br><strong>教育積點:</strong><br>${eventDiv.dataset.educationPoints || '無教育積點'}<br><br><strong>認定時數:</strong><br>${eventDiv.dataset.recognizedHours || '無認定時數'}<br><br><strong>活動內容:</strong><br>${content}<br><br><strong>聯絡資訊:</strong><br>${contact}`;
 
                 // Position the tooltip
                 const rect = event.target.getBoundingClientRect();
