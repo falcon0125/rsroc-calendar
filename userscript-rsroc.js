@@ -65,7 +65,7 @@
                     }
                      if (th.innerText.includes('活動內容')) {
                         const td = row.querySelector('td');
-                        if (td) eventContent = td.innerText.trim();
+                        if (td) eventContent = td.innerHTML.trim();
                     }
                     if (th.innerText.includes('教育積點')) {
                         const td = row.querySelector('td');
@@ -144,6 +144,7 @@
                 if (th.innerText.includes('活動內容')) {
                     const td = row.querySelector('td');
                     if (td) eventContent = td.innerText.trim();
+                   
                 }
                 if (th.innerText.includes('教育積點')) {
                     const td = row.querySelector('td');
@@ -254,6 +255,8 @@
             // Add hover event listeners
             eventDiv.addEventListener('mouseover', () => {
                 let content = eventDiv.dataset.eventContent || '無活動內容';
+                // Replace <br> tags with newlines for better readability
+                content = content.replace(/<br\s*\/?>/g, '\n').replace(/&nbsp;/g, ' '); // Replace <br> with newlines and &nbsp; with spaces
                 const contact = eventDiv.dataset.contactInfo || '無聯絡資訊';
                 const dateTime = eventDiv.dataset.eventDateTime || '無活動時間';
                 const location = eventDiv.dataset.eventLocation || '無活動地點';
