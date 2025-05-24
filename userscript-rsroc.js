@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name RSROC Event Details
+// @name Enhanced RSROC Events Calendar
 // @namespace http://tampermonkey.net/
 // @version 0.7
-// @description Extract event details and display them on the calendar page
+// @description : Extract event details and display them on the calendar page
 // @author Cheng Hsien Tsou
 // @match https://www.rsroc.org.tw/action/*
 // @match https://www.rsroc.org.tw/action/actions_onlinedetail.asp*
@@ -13,8 +13,10 @@
 // ==/UserScript==
 
 /*
-這個script使用來擷取RSROC網站上的活動資訊，並將教育積分時數顯示在活動頁面上。
-產生google calendar的連結，並在滑鼠懸停時顯示活動內容和聯絡資訊的tooltip。
+這個script使用來擷取RSROC網站上的活動資訊，
+並將教育積分時數顯示在活動頁面上。
+產生google calendar的連結，
+並在滑鼠懸停時顯示活動內容和聯絡資訊的tooltip。
 */
 
 
