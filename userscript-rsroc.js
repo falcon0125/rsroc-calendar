@@ -55,21 +55,40 @@
      * @returns {object} An object containing extracted event details.
      */
     function extractEventDetailsFromDocument(doc) {
-        let educationPoints = getTableCellText(doc, '教育積點');
+        const tableData = new Map();
+        const rows = doc.querySelectorAll('.articleContent table tr');
+        for (const row of rows) {
+            const th = row.querySelector('th');
+            const td = row.querySelector('td');
+            if (th && td) {
+                tableData.set(th.innerText.trim(), td);
+            }
+        }
+
+        const getDetail = (headerText, isHtml = false) => {
+            for (const [key, value] of tableData.entries()) {
+                if (key.includes(headerText)) {
+                    return isHtml ? value.innerHTML.trim() : value.innerText.trim();
+                }
+            }
+            return '';
+        };
+
+        let educationPoints = getDetail('教育積點');
         // Remove specific redundant text from education points
         if (educationPoints) {
             educationPoints = educationPoints.replace('放射診斷科專科醫師', '').trim();
         }
 
-        const recognizedHours = getTableCellText(doc, '認定時數');
-        const eventDateTime = getTableCellText(doc, '活動日期');
-        const eventLocation = getTableCellText(doc, '活動地點');
+        const recognizedHours = getDetail('認定時數');
+        const eventDateTime = getDetail('活動日期');
+        const eventLocation = getDetail('活動地點');
         // Get event content (can be HTML)
-        let eventContent = getTableCellText(doc, '活動內容', '.articleContent table tr', true);
+        let eventContent = getDetail('活動內容', true);
         // Get event description (can be HTML)
-        const eventDescription = getTableCellText(doc, '活動說明', '.articleContent table tr', true);
-        const contactInfo = getTableCellText(doc, '聯絡資訊');
-        const eventOrganizer = getTableCellText(doc, '主辦單位'); // Extract organizer explicitly
+        const eventDescription = getDetail('活動說明', true);
+        const contactInfo = getDetail('聯絡資訊');
+        const eventOrganizer = getDetail('主辦單位'); // Extract organizer explicitly
 
         // Combine event content and description if both exist and are different
         // This addresses the user's request to merge "活動說明" with "活動內容".
